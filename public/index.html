@@ -48,8 +48,19 @@
       background: ghostwhite;
     }
 
-    .status {
+    .status,
+    .search,
+    .image {
+      box-sizing: border-box;
       position: relative;
+    }
+
+    .search {
+      border: 1px solid #bbdefb;
+    }
+
+    .image {
+      border: 1px solid #00796b;
     }
 
     .status[data-range="100"] {
@@ -85,6 +96,24 @@
       text-shadow: -2px 2px 10px rgba(0, 0, 0, 0.5);
     }
 
+    .search::before {
+      content: '🔍';
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      font-size: 16px;
+      text-shadow: -2px 2px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .image::before {
+      content: '📷';
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      font-size: 16px;
+      text-shadow: -2px 2px 10px rgba(0, 0, 0, 0.5);
+    }
+
     form {
       display: flex;
       margin-top: 10px;
@@ -99,7 +128,7 @@
       border-radius: 4px;
       outline: none;
       margin-right: 10px;
-      transition: border-color 0.3s;
+      transition: all 0.3s;
     }
 
     input:focus {
@@ -187,7 +216,7 @@
   <div id="modal">
     <div id="modal-content">
       <span class="close">&times;</span>
-      <h2>Status Code Info</h2>
+      <h2 id="modal-title"></h2>
       <p id="modal-message"></p>
       <a id="modal-link" href="#" target="_blank">더보기</a>
     </div>
@@ -199,6 +228,7 @@
     const input = document.getElementById('input');
     const messages = document.getElementById('messages');
     const modal = document.getElementById('modal');
+    const modalTitle = document.getElementById('modal-title');
     const modalMessage = document.getElementById('modal-message');
     const modalLink = document.getElementById('modal-link');
     const closeBtn = document.getElementsByClassName('close')[0];
@@ -218,8 +248,9 @@
 
     form.addEventListener('submit', (e) => {
       e.preventDefault();
-      if (input.value) {
-        socket.emit('message', input.value.trim());
+      const msg = input.value.trim();
+      if (msg && msg.length <= 100) {
+        socket.emit('message', msg);
         input.value = '';
       }
     });
@@ -246,9 +277,32 @@
         }
 
         item.addEventListener('click', () => {
-          modalMessage.textContent = `${msg}: ${statusCodes[msg].message} - ${statusCodes[msg].mean}`;
+          modalTitle.textContent = statusCodes[msg].message;
+          modalMessage.textContent = `${msg} - ${statusCodes[msg].mean}`;
           modalLink.href = `https://developer.mozilla.org/ko/docs/Web/HTTP/Status/${msg}`;
           modal.style.display = 'block';
+        });
+      } else if (msg.startsWith('/search ')) {
+        item.classList.add('search');
+        const query = msg.split(' ').slice(1).join(' ');
+        item.textContent = query;
+        item.addEventListener('click', () => {
+          modalTitle.textContent = `Search`;
+          modalMessage.textContent = 'click link to result';
+          modalLink.href = `https://www.google.com/search?q=${query}`;
+          modal.style.display = 'block';
+        });
+      } else if (msg.startsWith('/img ')) {
+        item.classList.add('image');
+        const query = msg.split(' ').slice(1).join(' ');
+        item.textContent += ' (Loading...)';
+        fetch(`/api/search?q=${query}`)
+        .then(data=>data.json())
+        .then(data=>{
+          item.innerHTML = `<img src=${data.imageUrl} alt='image'/>`;
+          item.addEventListener('click', () => {
+            window.open(data.imageUrl);
+          });
         });
       }
     });
