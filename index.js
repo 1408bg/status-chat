@@ -10,6 +10,7 @@ const server = http.createServer(app);
 const io = socketIo(server);
 
 const PORT = 3000;
+const isDevelop = false;
 
 app.use(express.static('public'));
 
@@ -28,7 +29,7 @@ async function fetchFirstImage(query) {
 
 const isAllowedRequest = (req, res, next) => {
   const referer = req.get('Referer');
-  const allowedOrigin = 'http://localhost:3000/' // 'https://status-chat.ijw.app/';
+  const allowedOrigin = isDevelop ? 'http://localhost:3000/' : 'https://status-chat.ijw.app/';
   if (referer && referer.startsWith(allowedOrigin)) {
     return next();
   }
