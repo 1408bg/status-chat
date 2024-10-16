@@ -287,8 +287,8 @@
         const query = msg.split(' ').slice(1).join(' ');
         item.textContent = query;
         item.addEventListener('click', () => {
-          modalTitle.textContent = `Search`;
-          modalMessage.textContent = 'click link to result';
+          modalTitle.textContent = `Search ${query}`;
+          modalMessage.innerHTML = `<embed src=https://www.google.com/search?q=${query}/>`;
           modalLink.href = `https://www.google.com/search?q=${query}`;
           modal.style.display = 'block';
         });
@@ -307,6 +307,7 @@
         });
       } else if (msg.startsWith('/cls')) {
         messages.innerHTML = '';
+        messages.scrollTop = 0;
       }
     });
 
