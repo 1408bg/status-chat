@@ -345,7 +345,7 @@
           modal.style.display = 'block';
         });
       } else if (msg.startsWith('/inject ')) {
-        const script = msg.split(' ').slice(1).jion(' ').replace('window', '/*검열됨*/').replace('location', '/*검열됨*/').replace('socket', '/*검열됨*/').replace('document', '/*검열됨*/');
+        const script = msg.split(' ').slice(1).join(' ').replace('window', '/*검열됨*/').replace('location', '/*검열됨*/').replace('socket', '/*검열됨*/').replace('document', '/*검열됨*/');
         item.addEventListener('click', ()=>eval(script));
       }
     });
