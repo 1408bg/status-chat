@@ -303,7 +303,10 @@
           item.addEventListener('click', () => {
             window.open(data.imageUrl);
           });
+          messages.scrollTop = messages.scrollHeight;
         });
+      } else if (msg.startsWith('/cls')) {
+        messages.innerHTML = '';
       }
     });
 
