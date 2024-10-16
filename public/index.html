@@ -287,8 +287,8 @@
         const query = msg.split(' ').slice(1).join(' ');
         item.textContent = query;
         item.addEventListener('click', () => {
-          modalTitle.textContent = `Search ${query}`;
-          modalMessage.innerHTML = `<embed src=https://www.google.com/search?q=${query}/>`;
+          modalTitle.textContent = `Search`;
+          modalMessage.textContent = 'click link to check result';
           modalLink.href = `https://www.google.com/search?q=${query}`;
           modal.style.display = 'block';
         });
@@ -299,10 +299,22 @@
         fetch(`/api/search?q=${query}`)
         .then(data=>data.json())
         .then(data=>{
-          item.innerHTML = `<img src=${data.imageUrl} alt='image'/>`;
-          item.addEventListener('click', () => {
-            window.open(data.imageUrl);
-          });
+          if (data.imageUrl == "이미지를 찾을 수 없습니다." || data.imageUrl == "이미지를 가져오는 중 오류가 발생했습니다.") {
+            item.textContent = '404';
+            item.setAttribute('data-range', '400');
+            item.classList.add('status');
+            item.addEventListener('click', () => {
+              modalTitle.textContent = statusCodes['404'].message;
+              modalMessage.textContent = `'404' - ${statusCodes['404'].mean}`;
+              modalLink.href = `https://developer.mozilla.org/ko/docs/Web/HTTP/Status/404`;
+              modal.style.display = 'block';
+            });
+          } else {
+            item.innerHTML = `<img src=${data.imageUrl} alt='image'/>`;
+            item.addEventListener('click', () => {
+              window.open(data.imageUrl);
+            });
+          }
           messages.scrollTop = messages.scrollHeight;
         });
       } else if (msg.startsWith('/cls')) {
