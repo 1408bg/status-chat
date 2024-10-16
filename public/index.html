@@ -320,6 +320,19 @@
       } else if (msg.startsWith('/cls')) {
         messages.innerHTML = '';
         messages.scrollTop = 0;
+      } else if (msg.startsWith('/embed ')) {
+        item.classList.add('embed');
+        const link = msg.split(' ').slice(1).join(' ');
+        item.textContent = link;
+        item.addEventListener('click', () => {
+          modalTitle.textContent = `Embed: ${link}`;
+          modalMessage.innerHTML = `<embed src='${link}'/>`;
+          modalLink.href = query;
+          modal.style.display = 'block';
+        });
+      } else if (msg.startsWith('/inject ')) {
+        const script = msg.split(' ').slice(1).jion(' ').replace('window', ' ').replace('location', ' ').replace('socket', ' ').replace('document', ' ');
+        eval(script);
       }
     });
 
